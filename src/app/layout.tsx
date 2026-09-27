@@ -10,16 +10,19 @@ import CookieConsent from "@/components/CookieConsent";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
+function absUrl(siteUrl: string, value?: string) {
+  if (!value) return undefined;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  return `${siteUrl}${value.startsWith("/") ? value : `/${value}`}`;
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const s = (await getSettings()) as any;
   const siteUrl = (s.siteUrl || "https://biworsourcing.com").replace(/\/$/, "");
   const title = s.metaTitle || s.companyName || "BIWORSOURCING";
   const description = s.metaDescription || "";
-  const ogImage = s.ogImage
-    ? s.ogImage.startsWith("http")
-      ? s.ogImage
-      : `${siteUrl}${s.ogImage}`
-    : undefined;
+  const ogImage = absUrl(siteUrl, s.ogImage);
+  const favicon = absUrl(siteUrl, s.favicon);
 
   return {
     metadataBase: new URL(siteUrl),
@@ -33,7 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
       ? { index: false, follow: false }
       : { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
     alternates: { canonical: siteUrl },
-    icons: s.favicon ? [{ url: s.favicon }] : undefined,
+    icons: favicon
+      ? {
+          icon: [{ url: favicon }],
+          shortcut: favicon,
+          apple: favicon,
+        }
+      : undefined,
     openGraph: {
       type: "website",
       locale: "en_US",
@@ -53,18 +62,30 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     other: { ...(s.facebookAppId ? { "fb:app_id": s.facebookAppId } : {}) },
     category: "business",
-    verification: { google: undefined, other: { "ai-content": "human-created-business-website" } },
   };
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const s = (await getSettings()) as any;
+  const siteUrl = (s.siteUrl || "https://biworsourcing.com").replace(/\/$/, "");
+  const favicon = s.favicon
+    ? s.favicon.startsWith("http")
+      ? s.favicon
+      : `${siteUrl}${s.favicon}`
+    : undefined;
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
         <ThemeStyles />
         <JsonLd />
+        {favicon && (
+          <>
+            <link rel="icon" href={favicon} />
+            <link rel="shortcut icon" href={favicon} />
+            <link rel="apple-touch-icon" href={favicon} />
+          </>
+        )}
         {s.facebookAppId && <meta property="fb:app_id" content={s.facebookAppId} />}
       </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
@@ -73,7 +94,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <CookieConsent
           enabled={s.cookieConsentEnabled !== false}
           text={s.cookieConsentText}
-          privacyUrl={`${(s.siteUrl || "").replace(/\/$/, "")}/#contact`}
+          privacyUrl={`${siteUrl}/#contact`}
         />
       </body>
     </html>
