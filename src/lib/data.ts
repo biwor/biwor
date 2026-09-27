@@ -210,11 +210,11 @@ function writeJson(filename: string, data: unknown) {
 }
 
 async function kvGet<T>(table: "settings" | "sections" | "theme", fallback: T): Promise<T> {
-  const db = await getDB();
-  if (!db) return fallback;
-  const row = await db.prepare(`SELECT data FROM ${table} WHERE id = 1`).first<{ data: string }>();
-  if (!row?.data) return fallback;
   try {
+    const db = await getDB();
+    if (!db) return fallback;
+    const row = await db.prepare(`SELECT data FROM ${table} WHERE id = 1`).first<{ data: string }>();
+    if (!row?.data) return fallback;
     return JSON.parse(row.data) as T;
   } catch {
     return fallback;
@@ -222,19 +222,28 @@ async function kvGet<T>(table: "settings" | "sections" | "theme", fallback: T): 
 }
 
 async function kvSet(table: "settings" | "sections" | "theme", data: unknown) {
-  const db = await getDB();
-  if (!db) {
+  try {
+    const db = await getDB();
+    if (!db) {
+      writeJson(`${table}.json`, data);
+      return;
+    }
+    await db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (id INTEGER PRIMARY KEY CHECK (id = 1), data TEXT NOT NULL)`).run();
+    await db.prepare(`INSERT OR REPLACE INTO ${table} (id, data) VALUES (1, ?)`).bind(JSON.stringify(data)).run();
+  } catch {
     writeJson(`${table}.json`, data);
-    return;
   }
-  await db.prepare(`INSERT OR REPLACE INTO ${table} (id, data) VALUES (1, ?)`).bind(JSON.stringify(data)).run();
 }
 
 export async function getProducts(): Promise<Product[]> {
-  const db = await getDB();
-  if (!db) return readJson<Product[]>("products.json", []);
-  const { results } = await db.prepare("SELECT * FROM products").all<any>();
-  return (results || []).map((p) => ({ ...p, featured: Boolean(p.featured) }));
+  try {
+    const db = await getDB();
+    if (!db) return readJson<Product[]>("products.json", []);
+    const { results } = await db.prepare("SELECT * FROM products").all<any>();
+    return (results || []).map((p) => ({ ...p, featured: Boolean(p.featured) }));
+  } catch {
+    return readJson<Product[]>("products.json", []);
+  }
 }
 
 export async function saveProducts(products: Product[]) {
@@ -247,10 +256,14 @@ export async function saveProducts(products: Product[]) {
 }
 
 export async function getGallery(): Promise<GalleryItem[]> {
-  const db = await getDB();
-  if (!db) return readJson<GalleryItem[]>("gallery.json", []);
-  const { results } = await db.prepare("SELECT * FROM gallery").all<GalleryItem>();
-  return results || [];
+  try {
+    const db = await getDB();
+    if (!db) return readJson<GalleryItem[]>("gallery.json", []);
+    const { results } = await db.prepare("SELECT * FROM gallery").all<GalleryItem>();
+    return results || [];
+  } catch {
+    return readJson<GalleryItem[]>("gallery.json", []);
+  }
 }
 
 export async function saveGallery(items: GalleryItem[]) {
@@ -263,10 +276,14 @@ export async function saveGallery(items: GalleryItem[]) {
 }
 
 export async function getMedia(): Promise<MediaItem[]> {
-  const db = await getDB();
-  if (!db) return readJson<MediaItem[]>("media.json", []);
-  const { results } = await db.prepare("SELECT * FROM media ORDER BY createdAt DESC").all<MediaItem>();
-  return results || [];
+  try {
+    const db = await getDB();
+    if (!db) return readJson<MediaItem[]>("media.json", []);
+    const { results } = await db.prepare("SELECT * FROM media ORDER BY createdAt DESC").all<MediaItem>();
+    return results || [];
+  } catch {
+    return readJson<MediaItem[]>("media.json", []);
+  }
 }
 
 export async function saveMedia(items: MediaItem[]) {
@@ -279,15 +296,22 @@ export async function saveMedia(items: MediaItem[]) {
 }
 
 export async function addMedia(item: MediaItem) {
-  const db = await getDB();
-  if (!db) {
+  try {
+    const db = await getDB();
+    if (!db) {
+      const items = readJson<MediaItem[]>("media.json", []);
+      items.unshift(item);
+      writeJson("media.json", items);
+      return item;
+    }
+    await db.prepare(`INSERT INTO media (id, url, name, type, size, createdAt) VALUES (?, ?, ?, ?, ?, ?)`).bind(item.id, item.url, item.name, item.type, item.size, item.createdAt).run();
+    return item;
+  } catch {
     const items = readJson<MediaItem[]>("media.json", []);
     items.unshift(item);
     writeJson("media.json", items);
     return item;
   }
-  await db.prepare(`INSERT INTO media (id, url, name, type, size, createdAt) VALUES (?, ?, ?, ?, ?, ?)`).bind(item.id, item.url, item.name, item.type, item.size, item.createdAt).run();
-  return item;
 }
 
 export async function getSettings(): Promise<Settings> {
@@ -317,10 +341,14 @@ export async function saveTheme(theme: ThemeConfig) {
 }
 
 export async function getCertifications(): Promise<Certification[]> {
-  const db = await getDB();
-  if (!db) return readJson<Certification[]>("certifications.json", []);
-  const { results } = await db.prepare(`SELECT * FROM certifications ORDER BY "order" ASC`).all<any>();
-  return (results || []).map((c) => ({ ...c, visible: Boolean(c.visible) }));
+  try {
+    const db = await getDB();
+    if (!db) return readJson<Certification[]>("certifications.json", []);
+    const { results } = await db.prepare(`SELECT * FROM certifications ORDER BY "order" ASC`).all<any>();
+    return (results || []).map((c) => ({ ...c, visible: Boolean(c.visible) }));
+  } catch {
+    return readJson<Certification[]>("certifications.json", []);
+  }
 }
 
 export async function saveCertifications(items: Certification[]) {
@@ -333,10 +361,14 @@ export async function saveCertifications(items: Certification[]) {
 }
 
 export async function getMeetings(): Promise<MeetingRequest[]> {
-  const db = await getDB();
-  if (!db) return readJson<MeetingRequest[]>("meetings.json", []);
-  const { results } = await db.prepare("SELECT * FROM meetings ORDER BY createdAt DESC").all<MeetingRequest>();
-  return results || [];
+  try {
+    const db = await getDB();
+    if (!db) return readJson<MeetingRequest[]>("meetings.json", []);
+    const { results } = await db.prepare("SELECT * FROM meetings ORDER BY createdAt DESC").all<MeetingRequest>();
+    return results || [];
+  } catch {
+    return readJson<MeetingRequest[]>("meetings.json", []);
+  }
 }
 
 export async function saveMeetings(items: MeetingRequest[]) {
@@ -349,10 +381,14 @@ export async function saveMeetings(items: MeetingRequest[]) {
 }
 
 export async function getBuyers(): Promise<Buyer[]> {
-  const db = await getDB();
-  if (!db) return [];
-  const { results } = await db.prepare("SELECT * FROM buyers ORDER BY id DESC").all<Buyer>();
-  return results || [];
+  try {
+    const db = await getDB();
+    if (!db) return [];
+    const { results } = await db.prepare("SELECT * FROM buyers ORDER BY id DESC").all<Buyer>();
+    return results || [];
+  } catch {
+    return [];
+  }
 }
 
 export async function addBuyer(input: Omit<Buyer, "id" | "created_at">) {
