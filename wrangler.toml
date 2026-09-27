@@ -13,13 +13,13 @@ enabled = false
 
 [vars]
 NODE_ENV = "production"
+PUBLIC_R2_URL = "https://pub-84e42609a4954219a34755ae7b0b28c4.r2.dev"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "biwor-db"
 database_id = "5c07f71c-2768-40b4-aa6a-16c4a42365bb"
+
 [[r2_buckets]]
 binding = "IMAGES"
 bucket_name = "biwor-images"
-
-[vars]
-PUBLIC_R2_URL = "https://pub-84e42609a4954219a34755ae7b0b28c4.r2.dev"
