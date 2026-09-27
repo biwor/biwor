@@ -1,3 +1,5 @@
+import { getSettings } from "@/lib/data";
+
 type FooterProps = {
   companyName?: string;
   footerText?: string;
@@ -6,37 +8,26 @@ type FooterProps = {
   phone?: string;
   whatsapp?: string;
   logo?: string;
-  facebookUrl?: string;
-  linkedinUrl?: string;
-  instagramUrl?: string;
-  twitterUrl?: string;
-  footerCopyright?: string;
-  footerCol2Title?: string;
-  footerCol3Title?: string;
 };
 
-export default function Footer({
-  companyName = "BIWORSOURCING",
-  footerText,
-  email = "info@biworsourcing.com",
-  address = "Dhaka, Bangladesh",
-  phone,
-  whatsapp,
-  logo,
-  facebookUrl,
-  linkedinUrl,
-  instagramUrl,
-  twitterUrl,
-  footerCopyright,
-  footerCol2Title = "Quick Links",
-  footerCol3Title = "Contact",
-}: FooterProps) {
+export default async function Footer(props: FooterProps) {
+  const s = (await getSettings()) as any;
+  const companyName = props.companyName || s.companyName || "BIWORSOURCING";
+  const footerText = props.footerText || s.footerText;
+  const email = props.email || s.email || "info@biworsourcing.com";
+  const address = props.address || s.address || "Dhaka, Bangladesh";
+  const phone = props.phone || s.phone;
+  const whatsapp = props.whatsapp || s.whatsapp;
+  const logo = props.logo || s.logo;
+  const footerCopyright = s.footerCopyright;
+  const footerCol2Title = s.footerCol2Title || "Quick Links";
+  const footerCol3Title = s.footerCol3Title || "Contact";
   const socials = [
-    { href: facebookUrl, label: "Facebook" },
-    { href: linkedinUrl, label: "LinkedIn" },
-    { href: instagramUrl, label: "Instagram" },
-    { href: twitterUrl, label: "X" },
-  ].filter((s) => s.href);
+    { href: s.facebookUrl, label: "Facebook" },
+    { href: s.linkedinUrl, label: "LinkedIn" },
+    { href: s.instagramUrl, label: "Instagram" },
+    { href: s.twitterUrl, label: "X" },
+  ].filter((x) => x.href);
 
   return (
     <footer className="bg-slate-950 text-slate-400">
@@ -56,9 +47,9 @@ export default function Footer({
             </p>
             {socials.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-3 text-xs">
-                {socials.map((s) => (
-                  <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="hover:text-white transition">
-                    {s.label}
+                {socials.map((x) => (
+                  <a key={x.label} href={x.href} target="_blank" rel="noreferrer" className="hover:text-white transition">
+                    {x.label}
                   </a>
                 ))}
               </div>
@@ -77,21 +68,11 @@ export default function Footer({
             <h4 className="font-semibold text-white text-sm mb-4">{footerCol3Title}</h4>
             <ul className="space-y-2.5 text-sm">
               {address && <li>{address}</li>}
-              {email && (
-                <li>
-                  <a href={`mailto:${email}`} className="hover:text-white transition">{email}</a>
-                </li>
-              )}
-              {phone && (
-                <li>
-                  <a href={`tel:${phone}`} className="hover:text-white transition">{phone}</a>
-                </li>
-              )}
+              {email && <li><a href={`mailto:${email}`} className="hover:text-white transition">{email}</a></li>}
+              {phone && <li><a href={`tel:${phone}`} className="hover:text-white transition">{phone}</a></li>}
               {whatsapp && (
                 <li>
-                  <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer" className="hover:text-white transition">
-                    WhatsApp
-                  </a>
+                  <a href={`https://wa.me/${String(whatsapp).replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer" className="hover:text-white transition">WhatsApp</a>
                 </li>
               )}
             </ul>
