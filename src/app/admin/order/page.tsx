@@ -3,8 +3,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const DEFAULT_ITEMS = [
+  { id: "hero", label: "Hero", visible: true },
+  { id: "about", label: "About", visible: true },
+  { id: "bangladesh", label: "Bangladesh story", visible: true },
+  { id: "principles", label: "Principles", visible: true },
+  { id: "services", label: "Services", visible: true },
+  { id: "process5", label: "Five-stage process", visible: true },
+  { id: "clients", label: "Who we work with", visible: true },
+  { id: "leadtimes", label: "Lead times", visible: true },
+  { id: "products", label: "Products", visible: true },
+  { id: "certs", label: "Certifications", visible: true },
+  { id: "gallery", label: "Gallery", visible: true },
+  { id: "whyus", label: "Why us", visible: true },
   { id: "roadmap", label: "Tech pack to delivery", visible: true },
   { id: "terms", label: "Clear terms", visible: true },
+  { id: "contact", label: "Contact", visible: true },
 ];
 
 export default function SectionOrderPage() {
@@ -15,9 +28,12 @@ export default function SectionOrderPage() {
     fetch("/api/sections", { credentials: "include" })
       .then((r) => r.json())
       .then((all) => {
-        if (Array.isArray(all.homeOrder?.items) && all.homeOrder.items.length) {
-          setItems(all.homeOrder.items);
-        }
+        const saved = all.homeOrder?.items;
+        if (!Array.isArray(saved) || !saved.length) return;
+        const byId = Object.fromEntries(saved.map((x: any) => [x.id, x]));
+        const merged = DEFAULT_ITEMS.map((d) => ({ ...d, ...(byId[d.id] || {}), label: d.label }));
+        const extras = saved.filter((x: any) => !DEFAULT_ITEMS.some((d) => d.id === x.id));
+        setItems([...merged, ...extras]);
       });
   }, []);
 
@@ -50,7 +66,7 @@ export default function SectionOrderPage() {
         </div>
       </header>
       <main className="max-w-xl mx-auto px-4 py-8 space-y-3">
-        <p className="text-sm text-slate-600">Turn sections on or off and move them up or down. This controls the blocks above the footer.</p>
+        <p className="text-sm text-slate-600">Tick to show. Untick to hide. Use Up / Down to choose the order on the homepage.</p>
         {items.map((item, i) => (
           <div key={item.id} className="bg-white border rounded-xl p-3 flex items-center gap-3">
             <label className="flex items-center gap-2 text-sm flex-1">
