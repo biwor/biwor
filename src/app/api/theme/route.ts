@@ -1,23 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getTheme, saveTheme } from '@/lib/data';
-
+import { NextRequest, NextResponse } from "next/server";
+import { getTheme, saveTheme } from "@/lib/data";
 function isAuth(req: NextRequest) {
-  return req.cookies.get('biwor_admin')?.value === 'authenticated';
+  return req.cookies.get("biwor_admin")?.value === "authenticated";
 }
-
 export async function GET() {
-  return NextResponse.json(getTheme());
+  return NextResponse.json(await getTheme());
 }
-
 export async function PUT(req: NextRequest) {
-  if (!isAuth(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!isAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const body = await req.json();
-    saveTheme(body);
+    await saveTheme(body);
     return NextResponse.json(body);
   } catch {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

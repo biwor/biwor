@@ -8,7 +8,7 @@ function isAuth(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   if (!isAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json(getMeetings());
+  return NextResponse.json(await getMeetings());
 }
 
 export async function POST(req: NextRequest) {
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     if (!body.name || !body.email || !body.date || !body.time) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-    const items = getMeetings();
+    const items = await getMeetings();
     const meeting = {
       id: String(Date.now()),
       name: String(body.name).slice(0, 100),
@@ -31,9 +31,7 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
     };
     items.unshift(meeting);
-    saveMeetings(items);
-
-    // Send email notification (non-blocking failure)
+    await saveMeetings(items);
     const mail = await sendMeetingNotification({
       name: meeting.name,
       email: meeting.email,
@@ -43,7 +41,6 @@ export async function POST(req: NextRequest) {
       type: meeting.type,
       notes: meeting.notes,
     });
-
     return NextResponse.json({
       success: true,
       meeting,
@@ -60,11 +57,11 @@ export async function PUT(req: NextRequest) {
   if (!isAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await req.json();
-    const items = getMeetings();
+    const items = await getMeetings();
     const idx = items.findIndex((m) => m.id === body.id);
     if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     items[idx] = { ...items[idx], ...body };
-    saveMeetings(items);
+    await saveMeetings(items);
     return NextResponse.json(items[idx]);
   } catch {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
@@ -75,6 +72,6 @@ export async function DELETE(req: NextRequest) {
   if (!isAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const id = new URL(req.url).searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-  saveMeetings(getMeetings().filter((m) => m.id !== id));
+  await saveMeetings((await getMeetings()).filter((m) => m.id !== id));
   return NextResponse.json({ success: true });
 }

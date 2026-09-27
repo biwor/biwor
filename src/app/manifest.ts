@@ -1,8 +1,8 @@
 import { MetadataRoute } from "next";
 import { getSettings } from "@/lib/data";
 
-export default function manifest(): MetadataRoute.Manifest {
-  const s = getSettings();
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const s = await getSettings();
   return {
     name: s.companyName || "BIWORSOURCING",
     short_name: "BIWOR",

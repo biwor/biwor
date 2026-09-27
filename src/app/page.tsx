@@ -5,10 +5,10 @@ import CertLogoSlider from "@/components/CertLogoSlider";
 import MeetingScheduler from "@/components/MeetingScheduler";
 import Image from "next/image";
 
-export default function Home() {
-  const products = getProducts();
-  const gallery = getGallery();
-  const s = getSettings();
+export default async function Home() {
+  const products = await getProducts();
+  const gallery = await getGallery();
+  const s = await getSettings();
 
   const leadTimes = [
     { cat: "Basic Knitwear / T-Shirts", sample: "10–14 days", bulk: "45–55 days" },
@@ -19,7 +19,7 @@ export default function Home() {
     { cat: "Sweaters", sample: "18–25 days", bulk: "60–70 days" },
   ];
 
-  const certifications = getCertifications();
+  const certifications = await getCertifications();
 
   return (
     <>
