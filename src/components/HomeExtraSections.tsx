@@ -28,11 +28,13 @@ export default async function HomeExtraSections() {
   const s = await getSettings();
   const roadmap = sections.processRoadmap || {};
   const terms = sections.commercialTerms || {};
-  const steps = Array.isArray(roadmap.steps) && roadmap.steps.length ? roadmap.steps : DEFAULT_STEPS;
-  const cards = Array.isArray(terms.cards) && terms.cards.length ? terms.cards : DEFAULT_TERMS;
+  const steps: any[] = Array.isArray(roadmap.steps) && roadmap.steps.length ? roadmap.steps : DEFAULT_STEPS;
+  const cards: any[] = Array.isArray(terms.cards) && terms.cards.length ? terms.cards : DEFAULT_TERMS;
   const wa = String(s.whatsapp || "").replace(/\D/g, "");
 
-  const phases = Array.from(new Set(steps.map((st: any) => st.phaseTitle || st.phase)));
+  const phases: string[] = Array.from(
+    new Set(steps.map((st) => String(st.phaseTitle || st.phase || "")))
+  );
 
   return (
     <>
@@ -43,13 +45,13 @@ export default async function HomeExtraSections() {
             {roadmap.title || "From tech pack to delivery"}
           </h2>
           <p className="text-slate-600 mb-12 max-w-2xl">{roadmap.subtitle || "Fourteen steps. You can edit every line in Admin."}</p>
-          {phases.map((phaseTitle: string) => (
+          {phases.map((phaseTitle) => (
             <div key={phaseTitle} className="mb-12">
               <div className="text-xs font-semibold tracking-[0.14em] uppercase text-teal-800 mb-4 border-b border-slate-200 pb-2">
                 {phaseTitle}
               </div>
               <ol className="space-y-3">
-                {steps.filter((st: any) => (st.phaseTitle || st.phase) === phaseTitle).map((st: any) => (
+                {steps.filter((st) => String(st.phaseTitle || st.phase) === phaseTitle).map((st) => (
                   <li key={st.n} className="grid sm:grid-cols-[72px_1fr_auto] gap-3 items-start border border-slate-200 rounded-xl px-4 py-3 bg-slate-50">
                     <div className="text-xs font-bold text-teal-700 pt-0.5">Step {st.n}</div>
                     <div>
@@ -73,7 +75,7 @@ export default async function HomeExtraSections() {
           </h2>
           <p className="text-slate-600 mb-8">{terms.subtitle || "How we work \u2014 so you know the fit before a tech pack."}</p>
           <div className="grid md:grid-cols-3 gap-4">
-            {cards.map((c: any) => (
+            {cards.map((c) => (
               <div key={c.label} className="bg-white border-l-4 border-teal-700 rounded-r-xl p-5 shadow-sm">
                 <div className="text-[11px] uppercase tracking-wider text-slate-500 mb-2">{c.label}</div>
                 <div className="font-semibold text-slate-900 mb-2">{c.title}</div>
