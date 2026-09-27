@@ -13,3 +13,7 @@ enabled = false
 
 [vars]
 NODE_ENV = "production"
+[[d1_databases]]
+binding = "DB"
+database_name = "biwor-db"
+database_id = "PASTE-YOUR-DATABASE-ID-HERE"
