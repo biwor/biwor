@@ -18,7 +18,7 @@ export default async function Footer(props: FooterProps) {
   const address = props.address || s.address || "Dhaka, Bangladesh";
   const phone = props.phone || s.phone;
   const whatsapp = props.whatsapp || s.whatsapp;
-  const logo = props.logo || s.logo;
+  const logo = props.logo || s.footerLogo || s.logo;
   const footerCopyright = s.footerCopyright;
   const footerCol2Title = s.footerCol2Title || "Quick Links";
   const footerCol3Title = s.footerCol3Title || "Contact";
