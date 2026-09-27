@@ -11,7 +11,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const s = getSettings() as any;
+  const s = (await getSettings()) as any;
   const siteUrl = (s.siteUrl || "https://biworsourcing.com").replace(/\/$/, "");
   const title = s.metaTitle || s.companyName || "BIWORSOURCING";
   const description = s.metaDescription || "";
@@ -23,33 +23,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(siteUrl),
-    title: {
-      default: title,
-      template: `%s | ${s.companyName || "BIWORSOURCING"}`,
-    },
+    title: { default: title, template: `%s | ${s.companyName || "BIWORSOURCING"}` },
     description,
-    keywords: s.metaKeywords
-      ? String(s.metaKeywords).split(",").map((k: string) => k.trim())
-      : undefined,
+    keywords: s.metaKeywords ? String(s.metaKeywords).split(",").map((k: string) => k.trim()) : undefined,
     authors: [{ name: s.companyName || "BIWORSOURCING" }],
     creator: s.companyName,
     publisher: s.companyName,
     robots: s.robotsIndex === false
       ? { index: false, follow: false }
-      : {
-          index: true,
-          follow: true,
-          googleBot: {
-            index: true,
-            follow: true,
-            "max-image-preview": "large",
-            "max-snippet": -1,
-            "max-video-preview": -1,
-          },
-        },
-    alternates: {
-      canonical: siteUrl,
-    },
+      : { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
+    alternates: { canonical: siteUrl },
     icons: s.favicon ? [{ url: s.favicon }] : undefined,
     openGraph: {
       type: "website",
@@ -58,9 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: s.companyName || "BIWORSOURCING",
       title,
       description,
-      images: ogImage
-        ? [{ url: ogImage, width: 1200, height: 630, alt: title }]
-        : undefined,
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -70,22 +51,14 @@ export async function generateMetadata(): Promise<Metadata> {
       creator: s.twitterHandle || undefined,
       site: s.twitterHandle || undefined,
     },
-    other: {
-      ...(s.facebookAppId ? { "fb:app_id": s.facebookAppId } : {}),
-    },
+    other: { ...(s.facebookAppId ? { "fb:app_id": s.facebookAppId } : {}) },
     category: "business",
-    verification: {
-      // Add codes in admin later if needed; placeholders ignored when empty
-      google: undefined,
-      other: {
-        "ai-content": "human-created-business-website",
-      },
-    },
+    verification: { google: undefined, other: { "ai-content": "human-created-business-website" } },
   };
 }
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const s = getSettings() as any;
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const s = (await getSettings()) as any;
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
