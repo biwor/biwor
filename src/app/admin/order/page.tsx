@@ -25,15 +25,19 @@ export default function SectionOrderPage() {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    fetch("/api/sections", { credentials: "include" })
+    fetch("/api/sections", { credentials: "include", cache: "no-store" })
       .then((r) => r.json())
       .then((all) => {
         const saved = all.homeOrder?.items;
         if (!Array.isArray(saved) || !saved.length) return;
-        const byId = Object.fromEntries(saved.map((x: any) => [x.id, x]));
-        const merged = DEFAULT_ITEMS.map((d) => ({ ...d, ...(byId[d.id] || {}), label: d.label }));
-        const extras = saved.filter((x: any) => !DEFAULT_ITEMS.some((d) => d.id === x.id));
-        setItems([...merged, ...extras]);
+        const known = Object.fromEntries(DEFAULT_ITEMS.map((d) => [d.id, d]));
+        const ordered = saved.map((s: any) => ({
+          ...known[s.id],
+          ...s,
+          label: known[s.id]?.label || s.label || s.id,
+        }));
+        const missing = DEFAULT_ITEMS.filter((d) => !saved.some((s: any) => s.id === d.id));
+        setItems([...ordered, ...missing]);
       });
   }, []);
 
@@ -54,7 +58,7 @@ export default function SectionOrderPage() {
       credentials: "include",
       body: JSON.stringify({ key: "homeOrder", data: { items } }),
     });
-    setMsg(res.ok ? "Saved. Refresh the homepage." : "Save failed");
+    setMsg(res.ok ? "Saved. Open the homepage and hard refresh." : "Save failed — log in again");
   }
 
   return (
@@ -66,9 +70,10 @@ export default function SectionOrderPage() {
         </div>
       </header>
       <main className="max-w-xl mx-auto px-4 py-8 space-y-3">
-        <p className="text-sm text-slate-600">Tick to show. Untick to hide. Use Up / Down to choose the order on the homepage.</p>
+        <p className="text-sm text-slate-600">Tick to show. Untick to hide. Use Up / Down, then Save. After that hard-refresh the public homepage.</p>
         {items.map((item, i) => (
           <div key={item.id} className="bg-white border rounded-xl p-3 flex items-center gap-3">
+            <span className="text-xs text-slate-400 w-5">{i + 1}</span>
             <label className="flex items-center gap-2 text-sm flex-1">
               <input
                 type="checkbox"
