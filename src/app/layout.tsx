@@ -6,6 +6,7 @@ import ThemeStyles from "@/components/ThemeStyles";
 import Analytics from "@/components/Analytics";
 import JsonLd from "@/components/JsonLd";
 import CookieConsent from "@/components/CookieConsent";
+import HomeOrderApply from "@/components/HomeOrderApply";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -37,11 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
       : { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
     alternates: { canonical: siteUrl },
     icons: favicon
-      ? {
-          icon: [{ url: favicon }],
-          shortcut: favicon,
-          apple: favicon,
-        }
+      ? { icon: [{ url: favicon }], shortcut: favicon, apple: favicon }
       : undefined,
     openGraph: {
       type: "website",
@@ -90,6 +87,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         {children}
+        <HomeOrderApply />
         <Analytics />
         <CookieConsent
           enabled={s.cookieConsentEnabled !== false}
