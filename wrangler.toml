@@ -16,7 +16,7 @@ NODE_ENV = "production"
 [[d1_databases]]
 binding = "DB"
 database_name = "biwor-db"
-database_id = "PASTE-YOUR-DATABASE-ID-HERE"
+database_id = "5c07f71c-2768-40b4-aa6a-16c4a42365bb"
 [[r2_buckets]]
 binding = "IMAGES"
 bucket_name = "biwor-images"
