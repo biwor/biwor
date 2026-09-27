@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 type FooterProps = {
   companyName?: string;
   footerText?: string;
@@ -42,11 +40,6 @@ export default function Footer({
                 <a href={`mailto:${email}`} className="hover:text-white transition">
                   {email}
                 </a>
-              </li>
-              <li className="pt-3">
-                <Link href="/admin" className="text-xs text-slate-600 hover:text-slate-400 transition">
-                  Admin Login
-                </Link>
               </li>
             </ul>
           </div>

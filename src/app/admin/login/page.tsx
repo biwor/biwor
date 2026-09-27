@@ -64,9 +64,6 @@ export default function AdminLogin() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-        <p className="mt-4 text-xs text-center text-slate-400">
-          Default password: biwor2024
-        </p>
       </div>
     </div>
   );
