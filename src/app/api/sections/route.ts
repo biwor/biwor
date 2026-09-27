@@ -1,30 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSections, saveSections } from '@/lib/data';
-
+import { NextRequest, NextResponse } from "next/server";
+import { getSections, saveSections } from "@/lib/data";
 function isAuth(req: NextRequest) {
-  return req.cookies.get('biwor_admin')?.value === 'authenticated';
+  return req.cookies.get("biwor_admin")?.value === "authenticated";
 }
-
 export async function GET() {
-  return NextResponse.json(getSections());
+  return NextResponse.json(await getSections());
 }
-
 export async function PUT(req: NextRequest) {
-  if (!isAuth(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!isAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const body = await req.json();
-    // body can be full sections or { key, data } for one section
     if (body.key && body.data !== undefined) {
-      const sections = getSections();
+      const sections = await getSections();
       sections[body.key] = body.data;
-      saveSections(sections);
+      await saveSections(sections);
       return NextResponse.json(sections);
     }
-    saveSections(body);
+    await saveSections(body);
     return NextResponse.json(body);
   } catch {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

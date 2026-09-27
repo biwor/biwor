@@ -1,12 +1,11 @@
 import Script from "next/script";
 import { getSettings } from "@/lib/data";
 
-export default function Analytics() {
-  const s = getSettings() as any;
+export default async function Analytics() {
+  const s = (await getSettings()) as any;
   const gaId = s.googleAnalyticsId || "";
   const gtmId = s.googleTagManagerId || "";
   const fbPixel = s.facebookPixelId || "";
-
   return (
     <>
       {gaId && (
