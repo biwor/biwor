@@ -31,54 +31,54 @@ export default async function HomeExtraSections() {
   const steps: any[] = Array.isArray(roadmap.steps) && roadmap.steps.length ? roadmap.steps : DEFAULT_STEPS;
   const cards: any[] = Array.isArray(terms.cards) && terms.cards.length ? terms.cards : DEFAULT_TERMS;
   const wa = String(s.whatsapp || "").replace(/\D/g, "");
-
-  const phases: string[] = Array.from(
-    new Set(steps.map((st) => String(st.phaseTitle || st.phase || "")))
-  );
+  const phases: string[] = Array.from(new Set(steps.map((st) => String(st.phaseTitle || st.phase || ""))));
 
   return (
     <>
-      <section id="roadmap" className="py-20 md:py-24 bg-white">
+      <section id="roadmap" className="py-20 md:py-24 bg-[#f7f6f3]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <p className="text-teal-700 font-semibold text-xs tracking-[0.15em] uppercase mb-3">{roadmap.eyebrow || "How an order moves"}</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">
-            {roadmap.title || "From tech pack to delivery"}
+          <p className="text-[11px] tracking-[0.22em] uppercase text-slate-500 mb-3">{roadmap.eyebrow || "Development process"}</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-slate-900 mb-3">
+            {roadmap.title || "From tech pack to delivery."}
           </h2>
-          <p className="text-slate-600 mb-12 max-w-2xl">{roadmap.subtitle || "Fourteen steps. You can edit every line in Admin."}</p>
-          {phases.map((phaseTitle) => (
-            <div key={phaseTitle} className="mb-12">
-              <div className="text-xs font-semibold tracking-[0.14em] uppercase text-teal-800 mb-4 border-b border-slate-200 pb-2">
-                {phaseTitle}
+          <p className="text-slate-600 mb-12">{roadmap.subtitle || "Fourteen steps. Full visibility at every one."}</p>
+
+          {phases.map((phaseTitle, idx) => {
+            const group = steps.filter((st) => String(st.phaseTitle || st.phase) === phaseTitle);
+            return (
+              <div key={phaseTitle} className="mb-12">
+                <div className="flex items-baseline gap-3 mb-5 pb-2 border-b border-slate-300">
+                  <span className="text-[11px] tracking-[0.18em] uppercase text-slate-400">Phase {String(idx + 1).padStart(2, "0")}</span>
+                  <h3 className="font-serif text-xl text-slate-900">{phaseTitle}</h3>
+                </div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {group.map((st) => (
+                    <article key={st.n} className="bg-white border border-slate-200 p-4 min-h-[170px] flex flex-col">
+                      <div className="text-[11px] italic text-slate-400 mb-2">Step {st.n}</div>
+                      <h4 className="font-semibold text-slate-900 text-sm mb-2">{st.title}</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed flex-1">{st.text}</p>
+                      <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500">{st.time}</div>
+                    </article>
+                  ))}
+                </div>
               </div>
-              <ol className="space-y-3">
-                {steps.filter((st) => String(st.phaseTitle || st.phase) === phaseTitle).map((st) => (
-                  <li key={st.n} className="grid sm:grid-cols-[72px_1fr_auto] gap-3 items-start border border-slate-200 rounded-xl px-4 py-3 bg-slate-50">
-                    <div className="text-xs font-bold text-teal-700 pt-0.5">Step {st.n}</div>
-                    <div>
-                      <div className="font-semibold text-slate-900 text-sm">{st.title}</div>
-                      <p className="text-sm text-slate-600 mt-1 leading-relaxed">{st.text}</p>
-                    </div>
-                    <div className="text-xs text-slate-500 sm:text-right whitespace-nowrap">{st.time}</div>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      <section id="terms" className="py-16 bg-slate-100">
+      <section id="terms" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <p className="text-teal-700 font-semibold text-xs tracking-[0.15em] uppercase mb-3">{terms.eyebrow || "Working with us"}</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">
-            {terms.title || "Clear terms, no surprises"}
+          <p className="text-[11px] tracking-[0.22em] uppercase text-slate-500 mb-3">{terms.eyebrow || "Working with us"}</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-slate-900 mb-3">
+            {terms.title || "Clear terms, no surprises."}
           </h2>
-          <p className="text-slate-600 mb-8">{terms.subtitle || "How we work \u2014 so you know the fit before a tech pack."}</p>
+          <p className="text-slate-600 mb-10">{terms.subtitle || "How we work \u2014 so you know the fit before sending a tech pack."}</p>
           <div className="grid md:grid-cols-3 gap-4">
             {cards.map((c) => (
-              <div key={c.label} className="bg-white border-l-4 border-teal-700 rounded-r-xl p-5 shadow-sm">
-                <div className="text-[11px] uppercase tracking-wider text-slate-500 mb-2">{c.label}</div>
-                <div className="font-semibold text-slate-900 mb-2">{c.title}</div>
+              <div key={c.label} className="border border-slate-200 bg-[#f7f6f3] p-6">
+                <div className="text-[11px] tracking-[0.16em] uppercase text-slate-400 mb-3">{c.label}</div>
+                <div className="font-serif text-xl text-slate-900 mb-3">{c.title}</div>
                 <p className="text-sm text-slate-600 leading-relaxed">{c.text}</p>
               </div>
             ))}
